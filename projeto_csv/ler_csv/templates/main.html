@@ -1,0 +1,146 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <title>CSV File Filter</title>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'ler_csv/style.css' %}">
+        <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+        <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+    </head>
+    <body>
+
+        <div class="text-container">
+
+            <nav class="navbar navbar-light">
+
+                <a class="navbar-brand" href="#">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Microsoft_Office_Excel_%282019%E2%80%93present%29.svg/826px-Microsoft_Office_Excel_%282019%E2%80%93present%29.svg.png" width="30" height="30" class="d-inline-block align-top" alt="">
+                    CSV File Filter
+                </a>  
+                <span class="navbar-text">Upload your CSV files and search for data inside them</span>
+
+            </nav>
+
+        </div>
+        
+        <div class="content">
+
+            <div class="main">
+
+                <div class="large">
+
+                    <div class="csv-container">
+
+                        <h1>Upload file</h1><hr>
+                
+                        <form action="{% url "ler_csv:upload_csv" %}" method="POST" enctype="multipart/form-data" class="form-inline"> 
+                            
+                            {% csrf_token %}
+                            
+                            <div class="form-group">
+                                
+                                <label for="name" class="control-label">File: </label>
+                                <div class="csv-form">
+                                    <input type="file" name="csv_file" id="csv_file" required="True" class="form-control">                  
+                                    <button class="btn btn-success"><i class="fa-solid fa-upload"></i></button>
+                                </div>
+
+                            </div>
+                            
+                        </form>
+
+                        {% if request.session.error|length > 0 %}
+                            
+                            <p class="error">{{ request.session.error }}</p>
+                        
+                        {% endif %}
+
+                    </div>
+
+                    {% if request.session.result|length > 0 %}
+
+                        {% if file_names %}
+            
+                            <div class="result-container">
+                                
+                                <p>{{ request.session.result }}</p>
+                            
+                            </div>
+
+                        {% endif %}
+            
+                    {% endif %}
+
+                </div>
+
+                <div class="arq-container">
+
+                    <h3 class="uploaded-title">Uploaded files</h3>
+                    <hr>
+        
+                    {% for file in file_names %}
+
+                        <div class="uploaded-files">
+                
+                            {% if file|length > 15 %}
+                                
+                                <p>{{ file|slice:"15" }}...</p>
+                            
+                            {% else %}
+                                
+                                <p>{{ file }}</p>
+                            
+                            {% endif %}
+                            
+                            <a href="{% url "ler_csv:deletar_arquivo" file %}" class="btn-arch"><i class="fa-solid fa-xmark"></i></a>
+                    
+                        </div>
+
+                    {% endfor %}
+            
+                </div>
+
+            </div>
+
+            <div class="submit-container">
+                
+                <form action="{% url "ler_csv:buscar_string" %}" method="POST">
+                    
+                    {% csrf_token %}
+                    
+                    <input type="text" name="string_buscada" class="form-control" placeholder="Enter your text">
+                    <button class="btn btn-success"><i class="fa-solid fa-paper-plane"></i></button>
+                
+                </form>
+            
+            </div>
+
+            <div class="tips-container">
+                
+                <p>Tips:</p>
+                <ul>
+                    <li>Do not upload files that do not have the .csv format.</li>
+                    <li>The columns should be separated by a comma.</li>
+                    <li>
+                        Uploading a file more than once would result in an
+                        unnecessary repetition while filtering your input.
+                    </li>
+                    <li>Files too large may be unreadable.</li>
+                </ul>
+            
+            </div>
+
+        </div>
+
+    </body>
+<script src="https://kit.fontawesome.com/da711f5efc.js" crossorigin="anonymous"></script>
+</html>
